@@ -1,0 +1,136 @@
+
+#space-hr{
+    background-color: aliceblue;
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
+
+.container{
+    margin-top: 300px;
+    position: absolute;
+    top: 45%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+#cad {
+    text-decoration: none;
+}
+
+.navCommand{
+    padding: 10px;
+    margin: 10px;
+    color: white;
+}
+
+.row {
+    margin: 0;
+}
+
+.role2{
+    height: 400px;
+}
+
+#infoSys{
+    color: white;
+    margin-bottom: 0px;
+    padding-bottom: 0px;
+}
+
+#infoMsg{
+    margin-bottom: 0px;
+    padding-bottom: 0px;
+    color: white;
+}
+
+#cmdH{
+    margin-top: 15px;
+    width: 150px;
+    margin-bottom: 20px;
+    position: relative;
+    text-align: start;
+    color: rgb(127, 127, 138);
+    animation-name: mov;
+    animation-duration: 10s;
+    animation-timing-function: ease-out;
+    animation-iteration-count: infinite;
+    animation-direction: alternate;
+}
+
+@keyframes mov {
+    from {
+        left: 1vw;
+        color: rgb(199, 196, 196);
+    }
+    to {
+        left: 55vw;
+        color: rgb(0, 0, 0);
+    }
+}
+
+#chart_div3{
+    padding-left: 5%;
+}
+
+#chart_div4{
+    height: 10000px;
+    width: 95vw;
+}
+
+#formDiv{ 
+    border-radius: 15px;
+    box-shadow: 2px 2px 10px -3px white;   
+}
+#formDiv2{
+    border-radius: 15px;
+    box-shadow: 2px 2px 10px -3px black inset;
+}
+.verticalCenter {
+    display: flex;
+    align-items: center;
+}
+
+.verticalCenterG {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.pre{
+    position:relative;
+    margin: auto;
+    width: 50%;
+}
+.pre:before{
+    width:20px;
+    height:20px;
+    border-radius:20px;
+    background:blue;
+    content:'';
+    position:absolute;
+    background:#9b59b6;
+    animation: preloader_3_before 1.5s infinite ease-in-out;
+}
+ 
+.pre:after{
+    width:20px;
+    height:20px;
+    border-radius:20px;
+    background:blue;
+    content:'';
+    position:absolute;
+    background:#2ecc71;
+    left:22px;
+    animation: preloader_3_after 1.5s infinite ease-in-out;
+}
+ 
+@keyframes preloader_3_before {
+    0% {transform: translateX(0px) rotate(0deg)}
+    50% {transform: translateX(50px) scale(1.2) rotate(260deg); background:#2ecc71;border-radius:0px;}
+      100% {transform: translateX(0px) rotate(0deg)}
+}
+@keyframes preloader_3_after {
+    0% {transform: translateX(0px)}
+    50% {transform: translateX(-50px) scale(1.2) rotate(-260deg);background:#9b59b6;border-radius:0px;}
+    100% {transform: translateX(0px)}
+}
