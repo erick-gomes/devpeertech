@@ -1,11 +1,17 @@
 import React from 'react'
-/* eslint-disable react/prop-types */
-export default function MessageError (props) {
-    console.log(props)
-    if (props.children) {
+import ErrorAlert from './ErrorAlert'
+
+export default function MessageError ({ error }) {
+    const [alerta, setAlerta] = React.useState(error)
+    const [messageAlert, setMessageAlert] = React.useState('alert alert-danger')
+    setTimeout(() => {
+        setAlerta('')
+        setMessageAlert('')
+    }, 5000)
+    if (error) {
         return (
-            <div className="alert alert-danger">{props.children}</div>
+            <ErrorAlert classe={messageAlert}>{alerta}</ErrorAlert>
         )
     }
-    return <></>
+    return <div></div>
 }

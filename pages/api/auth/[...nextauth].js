@@ -1,33 +1,54 @@
 import NextAuth from 'next-auth'
 import Providers from 'next-auth/providers'
-import jose from 'node-jose'
 import Central from '../../../models/Central'
 
 const { Login } = Central
 
-async function getKey () {
-    return await jose.JWK.createKey('oct', 256, {
-        alg: 'HS512',
-        use: 'sig'
-    })
-}
-
-let key
-getKey().then(k => {
-    key = k
-})
-
 export default NextAuth({
+    callbacks: {
+        /**
+         * @param  {object}  token     Decrypted JSON Web Token
+         * @param  {object}  user      User object      (only available on sign in)
+         * @param  {object}  account   Provider account (only available on sign in)
+         * @param  {object}  profile   Provider profile (only available on sign in)
+         * @param  {boolean} isNewUser True if new user (only available on sign in)
+         * @return {object}            JSON Web Token that will be saved
+         */
+        async jwt (token, user, account, profile, isNewUser) {
+            if (account?.accessToken) {
+                token.accessToken = account.accessToken
+            }
+            const tokenSend = {
+                ...token,
+                ...user
+            }
+            return tokenSend
+        },
+        /**
+        * @param  {object} session      Session object
+        * @param  {object} token        User object    (if using database sessions)
+        *                               JSON Web Token (if not using database sessions)
+        * @return {object}              Session that will be returned to the client
+        */
+        async session (session, token) {
+            session.accessToken = token.accessToken
+            const sessionSend = {
+                ...token,
+                expires: session.expires
+            }
+            return sessionSend
+        }
+    },
     pages: {
         signIn: '/login'
     },
+    name: 'DevPeerTech',
+    credentials: {
+        username: { label: 'Username', type: 'text' },
+        password: { label: 'Password', type: 'password' }
+    },
     providers: [
         Providers.Credentials({
-            name: 'DevPeerTech',
-            credentials: {
-                username: { label: 'Username', type: 'text' },
-                password: { label: 'Password', type: 'password' }
-            },
             async authorize (credentials) {
                 if (!credentials.username || !credentials.password) return null
                 const loginUser = await Login.findOne({
@@ -36,24 +57,18 @@ export default NextAuth({
                         senha: credentials.password
                     }
                 })
-                let user
                 if (!loginUser) {
-                    user = false
+                    return null
                 } else {
                     const id = loginUser.dataValues.id
                     const username = loginUser.dataValues.username
-                    user = { id, username }
-                }
-
-                if (user) {
+                    const user = { id, username }
                     return user
-                } else {
-                    return null
                 }
             }
         })
     ],
     jwt: {
-        signingKey: key
+        signingKey: process.env.JWT_TOKEN
     }
 })

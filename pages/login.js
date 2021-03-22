@@ -1,14 +1,21 @@
-/* eslint-disable react/prop-types */
 import React from 'react'
 import { csrfToken } from 'next-auth/client'
 import styles from '../styles/styles.module.css'
 import MessageError from '../components/error/MessageError'
+import verifyServerSession from '../components/session/Session'
+import Head from 'next/head'
 
 function SignIn ({ csrfToken, query }) {
     let errorMessage
-    if (query.error) errorMessage = query.error
+    if (query.error) {
+        errorMessage = query.error
+        if (errorMessage === 'CredentialsSignin') errorMessage = 'Usuário ou senha incorretos'
+    }
     return (
         <div className={styles.container + ' container'} >
+            <Head>
+                <title>Login</title>
+            </Head>
             <div className="row justify-content-md-center">
                 <div className="col-md-5">
                     <div className="card" id={styles.formDiv}>
@@ -21,7 +28,7 @@ function SignIn ({ csrfToken, query }) {
                                     <input id="ipt"
                                         className="form-control credenciais"
                                         type="text"
-                                        name="user"
+                                        name="username"
                                         placeholder="Insira seu nome de usuário"
                                         maxLength="40"
                                         required />
@@ -30,7 +37,7 @@ function SignIn ({ csrfToken, query }) {
                                     <input id="ipt2"
                                         className="form-control credenciais"
                                         type="password"
-                                        name="pwd"
+                                        name="password"
                                         placeholder="Insira sua senha"
                                         maxLength="100"
                                         required />
@@ -59,6 +66,15 @@ function SignIn ({ csrfToken, query }) {
 export default SignIn
 
 export async function getServerSideProps (context) {
+    const r = await verifyServerSession(context)
+    if (r.session) {
+        return {
+            redirect: {
+                destination: '/',
+                permanent: false
+            }
+        }
+    }
     return {
         props: {
             csrfToken: await csrfToken(context),
