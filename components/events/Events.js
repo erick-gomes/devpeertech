@@ -4,18 +4,17 @@ import styles from '../../styles/styles.module.css'
 export default function EventError () {
     React.useEffect(() => {
         const entId = document.getElementById('ent')
-        setInterval(() => {
+        const getInterval = setInterval(() => {
             const snipSpace = document.getElementById('body-index')
             if (snipSpace) {
                 if (snipSpace.getAttribute('style')) {
-                    console.log(snipSpace.getAttribute('style'), 'style existe')
                     snipSpace.setAttribute('style', '')
                 } else {
-                    console.log(snipSpace.getAttribute('style'), 'style não existe')
-                    clearInterval()
+                    console.log('nao existe')
+                    clearInterval(getInterval)
                 }
             } else {
-                clearInterval()
+                clearInterval(getInterval)
             }
         }, 1000)
         entId.addEventListener('click', function () {
