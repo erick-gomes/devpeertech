@@ -1,5 +1,6 @@
 import React from 'react'
 import Image from 'next/image'
+import { signOut } from 'next-auth/client'
 
 export default function Nav () {
     return (
@@ -50,7 +51,7 @@ export default function Nav () {
                             <a className="dropdown-item" href="?p=5">Minhas postagens</a>
                             <div className="dropdown-divider"></div>
                             <a className="dropdown-item" href="?p=6">Meu perfil</a>
-                            <a className="dropdown-item" href="?p=0">Sair</a>
+                            <button style={{ cursor: 'pointer' }} className="dropdown-item btn btn-light" onClick={() => signOut()}>Sair</button>
                         </div>
                     </li>
                 </ul>
