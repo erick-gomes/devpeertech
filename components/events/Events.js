@@ -10,7 +10,6 @@ export default function EventError () {
                 if (snipSpace.getAttribute('style')) {
                     snipSpace.setAttribute('style', '')
                 } else {
-                    console.log('nao existe')
                     clearInterval(getInterval)
                 }
             } else {
