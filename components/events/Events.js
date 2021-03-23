@@ -4,7 +4,20 @@ import styles from '../../styles/styles.module.css'
 export default function EventError () {
     React.useEffect(() => {
         const entId = document.getElementById('ent')
-        document.getElementById('body-index').setAttribute('style', '')
+        setInterval(() => {
+            const snipSpace = document.getElementById('body-index')
+            if (snipSpace) {
+                if (snipSpace.getAttribute('style')) {
+                    console.log(snipSpace.getAttribute('style'), 'style existe')
+                    snipSpace.setAttribute('style', '')
+                } else {
+                    console.log(snipSpace.getAttribute('style'), 'style não existe')
+                    clearInterval()
+                }
+            } else {
+                clearInterval()
+            }
+        }, 1000)
         entId.addEventListener('click', function () {
             const frm = document.getElementById(styles.formDiv)
             const frm2 = document.getElementById(styles.formDiv2)
