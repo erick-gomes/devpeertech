@@ -4,7 +4,6 @@ import styles from '../styles/styles.module.css'
 import MessageError from '../components/error/MessageError'
 import verifyServerSession from '../components/session/Session'
 import Head from 'next/head'
-import Snip from '../components/sniply/Snip'
 import EventError from '../components/events/Events'
 
 function SignIn ({ csrfToken, query }) {
@@ -61,7 +60,6 @@ function SignIn ({ csrfToken, query }) {
                     </div>
                 </div>
             </div>
-            <Snip />
             <EventError />
         </div>
     )
