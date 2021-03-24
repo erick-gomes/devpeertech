@@ -4,18 +4,6 @@ import styles from '../../styles/styles.module.css'
 export default function EventError () {
     React.useEffect(() => {
         const entId = document.getElementById('ent')
-        const getInterval = setInterval(() => {
-            const snipSpace = document.getElementById('body-index')
-            if (snipSpace) {
-                if (snipSpace.getAttribute('style')) {
-                    snipSpace.setAttribute('style', '')
-                } else {
-                    clearInterval(getInterval)
-                }
-            } else {
-                clearInterval(getInterval)
-            }
-        }, 1000)
         entId.addEventListener('click', function () {
             const frm = document.getElementById(styles.formDiv)
             const frm2 = document.getElementById(styles.formDiv2)
