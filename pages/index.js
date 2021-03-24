@@ -5,7 +5,7 @@ import styles from '../styles/styles.module.css'
 import Nav from '../components/navigation/Nav'
 import Snip from '../components/sniply/Snip'
 
-export default function Login ({ session }) {
+export default function Login () {
     return (
         <>
             <Nav />
