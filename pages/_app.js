@@ -11,7 +11,7 @@ export default function MyApp ({ Component, pageProps }) {
                 <meta charSet="utf-8" />
                 <meta httpEquiv="X-UA-Compatible" content="IE=edge" />
                 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
-                <link rel="stylesheet" type="text/css" href="/assets/datatables/datatables.min.css"/>
+                <link rel="stylesheet" href="/assets/bootstrap/css/bootstrap.min.css" />
                 <title>DevPeerTech</title>
             </Head>
             <Component {...pageProps} />

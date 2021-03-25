@@ -1,19 +1,22 @@
 import React from 'react'
 import Image from 'next/image'
 import { signOut } from 'next-auth/client'
+import Link from 'next/link'
 
 export default function Nav () {
     return (
         <nav className="navbar navbar-expand-lg navbar-dark bg-dark">
-            <a className="navbar-brand" href="/">
-                <Image
-                    src="/assets/images/logo.png"
-                    width={70}
-                    height={60}
-                    className="d-inline-block align-top"
-                    alt="DevPeer Tech"
-                />
-            </a>
+            <Link href="/">
+                <a className="navbar-brand">
+                    <Image
+                        src="/assets/images/logo.png"
+                        width={60}
+                        height={60}
+                        className="d-inline-block align-top"
+                        alt="DevPeer Tech"
+                    />
+                </a>
+            </Link>
             <button className="navbar-toggler"
                 type="button"
                 data-toggle="collapse"
@@ -25,17 +28,14 @@ export default function Nav () {
             </button>
             <div className="collapse navbar-collapse" id="navbarNavDropdown">
                 <ul className="navbar-nav mr-auto">
-                    <li className="nav-item active">
-                        <a className="nav-link" href="">Exército da Luz</a>
+                    <li className="nav-item">
+                        <Link href="/"><a className="nav-link">Estatísticas</a></Link>
                     </li>
                     <li className="nav-item">
-                        <a className="nav-link" href="?p=1">Estátisticas</a>
+                        <Link href="/forum"><a className="nav-link">Fórum</a></Link>
                     </li>
                     <li className="nav-item">
-                        <a className="nav-link" href="?p=2">Fórum</a>
-                    </li>
-                    <li className="nav-item">
-                        <a className="nav-link" href="?p=3">Sobre</a>
+                        <Link href="/"><a className="nav-link">Sobre</a></Link>
                     </li>
                     <li className="nav-item dropdown">
                         <a className="nav-link dropdown-toggle"
@@ -44,13 +44,13 @@ export default function Nav () {
                             data-toggle="dropdown"
                             aria-haspopup="true"
                             aria-expanded="false">
-                   Opções
+                            Opções
                         </a>
                         <div className="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
-                            <a className="dropdown-item" href="?p=4">Criar postagem</a>
-                            <a className="dropdown-item" href="?p=5">Minhas postagens</a>
+                            <Link href="/"><a className="dropdown-item">Criar postagem</a></Link>
+                            <Link href="/"><a className="dropdown-item">Minhas postagens</a></Link>
                             <div className="dropdown-divider"></div>
-                            <a className="dropdown-item" href="?p=6">Meu perfil</a>
+                            <Link href="/"><a className="dropdown-item">Meu perfil</a></Link>
                             <button style={{ cursor: 'pointer' }} className="dropdown-item btn btn-light" onClick={() => signOut()}>Sair</button>
                         </div>
                     </li>

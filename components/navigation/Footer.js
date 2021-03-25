@@ -3,7 +3,8 @@ import React from 'react'
 export default function Footer () {
     return (
         <>
-            <script type="text/javascript" src="/assets/datatables/datatables.min.js"></script>
+            <script src="/assets/jquery/jquery-3.6.0.min.js"></script>
+            <script src="/assets/bootstrap/js/bootstrap.min.js"></script>
         </>
     )
 }

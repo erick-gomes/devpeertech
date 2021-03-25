@@ -2,8 +2,6 @@ import NextAuth from 'next-auth'
 import Providers from 'next-auth/providers'
 import Central from '../../../models/Central'
 
-const { Login } = Central
-
 export default NextAuth({
     callbacks: {
         /**
@@ -50,6 +48,7 @@ export default NextAuth({
     providers: [
         Providers.Credentials({
             async authorize (credentials) {
+                const { Login } = Central
                 if (!credentials.username || !credentials.password) return null
                 const loginUser = await Login.findOne({
                     where: {

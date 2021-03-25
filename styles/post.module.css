@@ -6,13 +6,32 @@
     padding: 20px;
     width: 85%;
 }
-#alert-error{
+#alertError{
     margin-left: 7.5%;
     margin-right: 7.5%;
 }
-tr, i{
-    color: #ffffff;
+
+.rowHead{
+    border: 1px solid grey;
+    padding-top: 20px;
+    padding-bottom: 20px;
+    padding-left: 2%;
+    padding-right: 5%;
+    color: white;
 }
-td{
-    color: #000000;
+
+.rowBorder{
+    background-color: white;
+    border-bottom: 1px solid grey;
+}
+
+.responsiveBreak{
+    background-color: white;
+    color: black;
+    margin: 0px;
+    border: 1px solid grey;
+    padding: 15px;
+    font-size: 15px;
+    word-wrap: break-word;
+    text-align: center;
 }

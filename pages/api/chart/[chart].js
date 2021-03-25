@@ -78,8 +78,8 @@ export default async function handler (req, res) {
             break
         }
         default:
-            res.status(404).json({ status: 404, message: 'not found' })
+            res.status(404).json({ status: 404, message: 'Not Found' })
             break
         }
-    } else { res.status(404).json({ status: 404, message: 'not found' }) }
+    } else { res.status(404).json({ status: 404, message: 'Not Found' }) }
 }
