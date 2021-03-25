@@ -22,7 +22,8 @@ async function searchPosts (search, r) {
             dislikes,
             date_post
         } = post.dataValues
-        const image = await (await fetch(`${process.env.NEXTAUTH_URL}/api/image/${category}`)).json()
+        const categoryOut = encodeURIComponent(category)
+        const image = await (await fetch(`${process.env.NEXTAUTH_URL}/api/image/${categoryOut}`)).json()
         if (image.status !== '200') {
             posts.push({
                 id,
@@ -63,9 +64,22 @@ export default function Forum ({ posts }) {
             return (
                 <>
                     <Nav />
-                    <div className="container-fluid">
-                        <i style={{ color: '#ffffff' }}
+                    <div className="container-fluid text-center mt-5">
+                        <h1 style={{
+                            color: '#ffffff'
+                        }}>Status 404</h1>
+                        <h2 className="mb-5" style={{
+                            color: '#ffffff'
+                        }}>Not found</h2>
+                        <i style={{
+                            color: '#ffffff',
+                            fontSize: '20px'
+                        }}
                         >Nenhuma postagem encontrada :(</i>
+                        <p style={{
+                            color: '#ffffff',
+                            fontSize: '20px'
+                        }}>Deseja voltar para <Link href="/forum"><a>tela inicial</a></Link>?</p>
                     </div>
                 </>
             )
