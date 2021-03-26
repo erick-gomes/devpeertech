@@ -47,7 +47,7 @@ export default function Nav () {
                             Opções
                         </a>
                         <div className="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
-                            <Link href="/"><a className="dropdown-item">Criar postagem</a></Link>
+                            <Link href="/forum/create"><a className="dropdown-item">Criar postagem</a></Link>
                             <Link href="/"><a className="dropdown-item">Minhas postagens</a></Link>
                             <div className="dropdown-divider"></div>
                             <Link href="/"><a className="dropdown-item">Meu perfil</a></Link>

@@ -1,15 +1,13 @@
 /* eslint-disable camelcase */
 import React from 'react'
-import verifyServerSession from '../components/session/Session'
-// import postagem from '../styles/post.module.css'
-import Nav from '../components/navigation/Nav'
-import Central from '../models/Central'
+import verifyServerSession from '../../components/session/Session'
+import Nav from '../../components/navigation/Nav'
+import Central from '../../models/Central'
 import { Op } from 'sequelize'
 import Image from 'next/image'
 import Link from 'next/link'
-// import Snip from '../components/sniply/Snip'
 
-async function searchPosts (search, r) {
+async function searchPosts (search, r, context) {
     const posts = []
     for (const post of search) {
         const {
@@ -104,7 +102,7 @@ export default function Forum ({ posts }) {
                         </div>
                         <div className="col-sm-10">
                             <div className="text-truncate mb-2">
-                                <Link href={`/forum/${post.id}`}>
+                                <Link href={`/forum/post/${post.id}`}>
                                     <a>{post.subject}</a>
                                 </Link>
                             </div>
@@ -121,54 +119,50 @@ export default function Forum ({ posts }) {
 }
 
 export async function getServerSideProps (context) {
-    const r = await verifyServerSession(context)
-    if (r.redirect) {
-        return { redirect: r.redirect }
-    }
+    try {
+        const r = await verifyServerSession(context)
+        if (r.redirect) {
+            return { redirect: r.redirect }
+        }
 
-    const { Post } = Central
-    if (context.query.s) {
-        const search = await Post.findAll({
-            order: [['createdAt', 'DESC']],
-            limit: 15,
-            where: {
-                [Op.or]: {
-                    subject: {
-                        [Op.iLike]: `%${context.query.s}%`
-                    },
-                    category: {
-                        [Op.iLike]: `${context.query.s}%`
+        const { Post } = Central
+
+        if (context.query.s) {
+            const search = await Post.findAll({
+                order: [['createdAt', 'DESC']],
+                limit: 15,
+                where: {
+                    [Op.or]: {
+                        subject: {
+                            [Op.iLike]: `%${context.query.s}%`
+                        },
+                        category: {
+                            [Op.iLike]: `${context.query.s}%`
+                        }
                     }
                 }
+            })
+            if (search[0]) {
+                return await searchPosts(search, r, context.req.headers.cookie)
             }
-        })
-        if (search[0]) {
-            try {
+        } else {
+            const search = await Post.findAll({ order: [['createdAt', 'DESC']], limit: 15 })
+            if (search[0]) {
                 return await searchPosts(search, r)
-            } catch (error) {
-                return {
-                    notFound: true
+            }
+        }
+        return {
+            props: {
+                session: r.session,
+                posts: {
+                    status: '404'
                 }
             }
         }
-    } else {
-        const search = await Post.findAll({ order: [['createdAt', 'DESC']], limit: 15 })
-        if (search[0]) {
-            try {
-                return await searchPosts(search, r)
-            } catch (error) {
-                return {
-                    notFound: true
-                }
-            }
-        }
-    }
-    return {
-        props: {
-            session: r.session,
-            posts: {
-                status: '404'
-            }
+    } catch (error) {
+        console.error(error)
+        return {
+            notFound: true
         }
     }
 }
