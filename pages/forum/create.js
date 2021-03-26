@@ -5,7 +5,7 @@ import path from 'path'
 import postagem from '../../styles/post.module.css'
 import Nav from '../../components/navigation/Nav'
 
-export default function Post ({ category, query }) {
+export default function CreatePost ({ category, query }) {
     let sucesso
     let erro
     if (query.success) {
