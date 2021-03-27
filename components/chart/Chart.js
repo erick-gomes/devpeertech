@@ -45,7 +45,9 @@ export default function Chart () {
                         ['Links', data.links],
                         ['Mídia', data.media]
                     ])
-                    const chart = new google.visualization.PieChart(document.getElementById(styles.chart_div))
+                    const ch = document.getElementById(styles.chart_div)
+                    if (!ch) return
+                    const chart = new google.visualization.PieChart(ch)
                     chart.draw(dataView, options)
                     if (loadRemove) {
                         const preload = document.getElementById(styles.pre1)
@@ -95,7 +97,9 @@ export default function Chart () {
                         ['Travas', data2.trava],
                         ['Flood', data2.flood]
                     ])
-                    const chart2 = new google.visualization.PieChart(document.getElementById(styles.chart_div2))
+                    const ch2 = document.getElementById(styles.chart_div2)
+                    if (!ch2) return
+                    const chart2 = new google.visualization.PieChart(ch2)
                     chart2.draw(dataView2, options2)
                     if (loadRemove) {
                         const preload2 = document.getElementById(styles.pre2)
@@ -127,7 +131,9 @@ export default function Chart () {
                         ['CPU', data3.cpu],
                         ['Internet', data3.network]
                     ])
-                    const chart3 = new google.visualization.Gauge(document.getElementById(styles.chart_div3))
+                    const ch3 = document.getElementById(styles.chart_div3)
+                    if (!ch3) return
+                    const chart3 = new google.visualization.Gauge(ch3)
                     chart3.draw(dataView3, options3)
                     document.getElementById(styles.infoSys).innerText = 'Informações do Sistema'
                     if (loadRemove) {
@@ -180,7 +186,9 @@ export default function Chart () {
                     for (const user of data4) {
                         dataView4.addRows([[user.username, user.total_user_msg]])
                     }
-                    const chart4 = new google.charts.Bar(document.getElementById(styles.chart_div4))
+                    const ch4 = document.getElementById(styles.chart_div4)
+                    if (!ch4) return
+                    const chart4 = new google.charts.Bar(ch4)
                     if (!isMobile) {
                         chart4.draw(dataView4, google.charts.Bar.convertOptions(options4))
                     }
@@ -195,7 +203,9 @@ export default function Chart () {
         })
     }
     React.useEffect(() => {
-        loadChart(true, false)
+        $(document).ready(() => {
+            loadChart(true, false)
+        })
         $(window).resize(() => {
             loadChart(false, false)
         })
