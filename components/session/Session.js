@@ -19,11 +19,10 @@ export function verifySession () {
     const [session, loading] = useSession()
     if (!session) {
         try {
-            if (location.pathname !== '/login') {
-                React.useEffect(() => {
-                    location.replace('/login')
-                })
-            }
+            React.useEffect(() => {
+                location.replace('/login')
+            })
+            return false
         } catch (error) {
             console.error(error)
         }

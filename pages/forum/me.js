@@ -1,15 +1,13 @@
-/* eslint-disable camelcase */
 import React from 'react'
+import { searchPosts } from '../../models/Utils/LibPost'
 import verifyServerSession from '../../components/session/Session'
 import Nav from '../../components/navigation/Nav'
 import Central from '../../models/Central'
-import { Op } from 'sequelize'
+import Status404 from '../../components/error/PostStatus'
 import Image from 'next/image'
 import Link from 'next/link'
-import { searchPosts } from '../../models/Utils/LibPost'
-import Status404 from '../../components/error/PostStatus'
 
-export default function Forum ({ posts }) {
+export default function Me ({ posts }) {
     if (posts.status) {
         if (posts.status === '404') {
             return <Status404 />
@@ -58,31 +56,15 @@ export async function getServerSideProps (context) {
         }
 
         const { Post } = Central
-
-        if (context.query.s) {
-            const search = await Post.findAll({
-                order: [['createdAt', 'DESC']],
-                limit: 15,
-                where: {
-                    [Op.or]: {
-                        subject: {
-                            [Op.iLike]: `%${context.query.s}%`
-                        },
-                        category: {
-                            [Op.iLike]: `${context.query.s}%`
-                        }
-                    }
-                }
-            })
-            if (search[0]) {
-                return await searchPosts(search, r)
-            }
-        } else {
-            const search = await Post.findAll({ order: [['createdAt', 'DESC']], limit: 15 })
-            if (search[0]) {
-                return await searchPosts(search, r)
-            }
+        const guest = r.session.username
+        const search = await Post.findAll({
+            order: [['createdAt', 'DESC']],
+            where: { guest }
+        })
+        if (search[0]) {
+            return await searchPosts(search, r)
         }
+
         return {
             props: {
                 session: r.session,

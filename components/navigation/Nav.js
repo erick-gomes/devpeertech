@@ -48,7 +48,7 @@ export default function Nav () {
                         </a>
                         <div className="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
                             <Link href="/forum/create"><a className="dropdown-item">Criar postagem</a></Link>
-                            <Link href="/"><a className="dropdown-item">Minhas postagens</a></Link>
+                            <Link href="/forum/me"><a className="dropdown-item">Minhas postagens</a></Link>
                             <div className="dropdown-divider"></div>
                             <Link href="/"><a className="dropdown-item">Meu perfil</a></Link>
                             <button style={{ cursor: 'pointer' }} className="dropdown-item btn btn-light" onClick={() => signOut()}>Sair</button>
