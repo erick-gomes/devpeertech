@@ -35,7 +35,7 @@ export default function Nav () {
                         <Link href="/forum"><a className="nav-link">Fórum</a></Link>
                     </li>
                     <li className="nav-item">
-                        <Link href="/"><a className="nav-link">Sobre</a></Link>
+                        <Link href="/sobre"><a className="nav-link">Sobre</a></Link>
                     </li>
                     <li className="nav-item dropdown">
                         <a className="nav-link dropdown-toggle"
