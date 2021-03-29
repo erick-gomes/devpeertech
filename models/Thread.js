@@ -1,21 +1,9 @@
 import connection from '../config/database'
 import sequelize from 'sequelize'
+
 const { DataTypes } = sequelize
 
-const post = connection.define('posts', {
-    category: {
-        type: DataTypes.STRING(50),
-        allowNull: false
-    },
-    condition: {
-        type: DataTypes.STRING(30),
-        allowNull: false,
-        defaultValue: 'open'
-    },
-    subject: {
-        type: DataTypes.STRING(120),
-        allowNull: false
-    },
+const thread = connection.define('threads', {
     content: {
         type: DataTypes.TEXT,
         allowNull: false
@@ -30,9 +18,10 @@ const post = connection.define('posts', {
         allowNull: false,
         defaultValue: 0
     },
-    datePost: {
+    dateThread: {
         type: DataTypes.STRING(30),
         allowNull: false
     }
 })
-export default post
+
+export default thread

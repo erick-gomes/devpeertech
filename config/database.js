@@ -8,10 +8,10 @@ const connection = new Sequelize({
             rejectUnauthorized: false
         }
     },
-    host: 'ec2-52-71-231-37.compute-1.amazonaws.com',
-    username: 'sbyqtvqvptfzuo',
-    password: '683a11b5e66a697c6adfc76a6474d69433bfe289b048a54ea19c4dfde1cce12e',
-    database: 'd97h7d7pvhpfh5',
+    host: 'ec2-34-225-103-117.compute-1.amazonaws.com',
+    username: 'oyajhdpjmfddgp',
+    password: 'f9eb24f41740c1ef34bb43d6dbac0fc75935b5c8678ac3e7e118b14cb6b41e0a',
+    database: 'd7t4d1grph7a62',
     define: {
         timestamps: true
     }

@@ -1,4 +1,4 @@
-import connection from '../config/database.js'
+import connection from '../config/database'
 import sequelize from 'sequelize'
 
 const { DataTypes } = sequelize

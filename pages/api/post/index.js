@@ -48,13 +48,17 @@ export default async function handler (req, res) {
                 month: '2-digit',
                 day: '2-digit'
             })
-            const { Post } = Central
-            await Post.create({
-                guest: username,
+            const { Login } = Central
+            const login = await Login.findOne({
+                where: { username }
+            })
+
+            if (!login) return res.status(500).json({ status: '500', message: 'Internal Server Error' })
+            await login.createPost({
                 subject,
                 category,
                 content,
-                date_post: datePost
+                datePost
             })
 
             return res.redirect('/forum/create?success=true')

@@ -68,19 +68,26 @@ function SignIn ({ csrfToken, query }) {
 export default SignIn
 
 export async function getServerSideProps (context) {
-    const r = await verifyServerSession(context)
-    if (r.session) {
-        return {
-            redirect: {
-                destination: '/',
-                permanent: false
+    try {
+        const r = await verifyServerSession(context)
+        if (r.session) {
+            return {
+                redirect: {
+                    destination: '/',
+                    permanent: false
+                }
             }
         }
-    }
-    return {
-        props: {
-            csrfToken: await csrfToken(context),
-            query: context.query
+        return {
+            props: {
+                csrfToken: await csrfToken(context),
+                query: context.query
+            }
+        }
+    } catch (err) {
+        console.error(err)
+        return {
+            notFound: true
         }
     }
 }

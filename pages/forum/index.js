@@ -1,4 +1,3 @@
-/* eslint-disable camelcase */
 import React from 'react'
 import verifyServerSession from '../../components/session/Session'
 import Nav from '../../components/navigation/Nav'
