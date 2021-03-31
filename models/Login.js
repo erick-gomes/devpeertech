@@ -8,6 +8,14 @@ const login = connection.define('logins', {
         type: DataTypes.STRING,
         allowNull: false
     },
+    image: {
+        type: DataTypes.TEXT,
+        allowNull: true
+    },
+    describe: {
+        type: DataTypes.TEXT,
+        allowNull: true
+    },
     email: {
         type: DataTypes.STRING,
         allowNull: true
