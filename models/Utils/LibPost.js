@@ -1,4 +1,7 @@
+// import Central from '../Central'
+
 export async function searchPosts (search, r) {
+    // const { Login } = Central
     const posts = []
     for (const post of search) {
         const {
@@ -10,7 +13,9 @@ export async function searchPosts (search, r) {
             dislikes,
             datePost
         } = post.dataValues
-        const guest = search.getLogin().username
+        // const login = await Login.findOne({ where: { loginId } })
+        const obj = await post.getLogin()
+        const guest = obj.dataValues.username
         const categoryOut = encodeURIComponent(category)
         const image = await (await fetch(`${process.env.NEXTAUTH_URL}/api/image/${categoryOut}`)).json()
         if (image.status !== '200') {

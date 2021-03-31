@@ -56,10 +56,10 @@ export async function getServerSideProps (context) {
         }
 
         const { Post } = Central
-        const guest = r.session.username
+        const loginId = r.session.id
         const search = await Post.findAll({
             order: [['createdAt', 'DESC']],
-            where: { guest }
+            where: { loginId }
         })
         if (search[0]) {
             return await searchPosts(search, r)
