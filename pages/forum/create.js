@@ -59,7 +59,7 @@ export default function CreatePost ({ category, query }) {
                                     type="text" name="subject"
                                     className="form-control" id="assuntoInfo"
                                     placeholder="Sua dúvida aqui"
-                                    maxLength="40" required />
+                                    maxLength="100" required />
                             </div>
                             <div className="form-group input-group">
                                 <div className="input-group-prepend">
@@ -99,6 +99,7 @@ export async function getServerSideProps (context) {
         if (r.redirect) {
             return { redirect: r.redirect }
         }
+
         const directory = path.resolve(process.cwd(), 'images')
         const categorias = fs.readdirSync(directory)
         const category = []

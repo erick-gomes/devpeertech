@@ -40,7 +40,7 @@ export default function Forum ({ posts }) {
                             <div className="text-truncate">{post.content}</div>
                             <div className="mt-3" style={{
                                 fontSize: '12px'
-                            }}><i>{`${post.date_post} por ${post.guest}`}</i></div>
+                            }}><i>{`${post.datePost} por ${post.guest}`}</i></div>
                         </div>
                     </div>
                 ))}

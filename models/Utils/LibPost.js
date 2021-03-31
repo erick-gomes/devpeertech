@@ -10,11 +10,13 @@ export async function searchPosts (search, r) {
             dislikes,
             datePost
         } = post.dataValues
+        const guest = search.getLogin().username
         const categoryOut = encodeURIComponent(category)
         const image = await (await fetch(`${process.env.NEXTAUTH_URL}/api/image/${categoryOut}`)).json()
         if (image.status !== '200') {
             posts.push({
                 id,
+                guest,
                 category,
                 subject,
                 content,
@@ -26,6 +28,7 @@ export async function searchPosts (search, r) {
         } else {
             posts.push({
                 id,
+                guest,
                 category,
                 subject,
                 content,

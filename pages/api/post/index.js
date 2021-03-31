@@ -25,7 +25,7 @@ export default async function handler (req, res) {
             if (!aceptCat[0]) return res.redirect('/forum/create?error=catinvalid')
 
             // verificação do assunto
-            if (req.body.subject.length > 50) {
+            if (req.body.subject.length > 100) {
                 return res.redirect('/forum/create?error=submax')
             } else if (req.body.subject.length < 5) {
                 return res.redirect('/forum/create?error=submin')
@@ -52,7 +52,6 @@ export default async function handler (req, res) {
             const login = await Login.findOne({
                 where: { username }
             })
-
             if (!login) return res.status(500).json({ status: '500', message: 'Internal Server Error' })
             await login.createPost({
                 subject,
@@ -63,6 +62,7 @@ export default async function handler (req, res) {
 
             return res.redirect('/forum/create?success=true')
         } catch (error) {
+            console.error(error)
             res.status(500).json({ status: '500', message: 'Internal Server Error' })
         }
     } else {
