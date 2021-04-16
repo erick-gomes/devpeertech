@@ -1,7 +1,8 @@
 {
     "env": {
         "browser": true,
-        "es2021": true
+        "es2021": true,
+        "node": true
     },
     "extends": [
         "plugin:react/recommended",
@@ -18,7 +19,7 @@
         "react"
     ],
     "rules": {
-        "react/props-types": false,
+        "react/prop-types": "off",
         "indent": ["error", 4]
     }
 }

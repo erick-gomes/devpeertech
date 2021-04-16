@@ -1,27 +1,41 @@
 import React from 'react'
 import { render } from 'react-dom'
-import { FontAwesomeIcon  } from '@fortawesome/react-fontawesome'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faCommentDots, faPaperclip } from '@fortawesome/free-solid-svg-icons'
-import { 
-    Container, Button, InputGroup, 
-    FormControl, Card, Row, 
+import {
+    Container, Button, InputGroup,
+    FormControl, Card, Row,
     Col, FormFile, Form
 } from 'react-bootstrap'
 import io from 'socket.io-client'
-import socketVerify from '../components/socket/Socket.js'
+import socketVerify from '../utils/socket/socket.js'
 import Message from '../components/chat/Chat.js'
+import { input } from '../utils/inputs/input.js'
+import Upload from '../components/chat/Upload.js'
 
 export default function Home () {
+    // states
+    const [progress, setProgress] = React.useState(0)
+    const [showModal, setShowModal] = React.useState(false)
+
+    // DOM
     React.useEffect(() => {
+        require('bootstrap')
+
+        // socket instance
         const socket = io()
-    
-        socket.on('all-users', users => {
-            console.log(users)
+
+        socket.on('all-users', ({ users, ips }) => {
+            console.table(users)
+            console.table(ips)
+        })
+
+        socket.once('connect', () => {
+            socket.emit('connect-server')
         })
 
         const rendered = []
         socket.on('con', ({ id, ip }) => {
-            console.log(ip)
             const message = <Message key={rendered.length} msg={id} status="join"/>
             rendered.push(message)
             render(
@@ -52,56 +66,65 @@ export default function Home () {
         // event listeners
         const mSend = document.getElementById('mediaSend')
         const files = []
-        const errors = []
         if (mSend) {
-            mSend.addEventListener('change', event => {
-                console.log(event.target.files)
+            mSend.addEventListener('change', async event => {
                 const reader = new FileReader()
-                for (const file of event.target.files) {
-                    const type = file.type
-                    if (!(
-                        type.includes('audio') || 
-                        type.includes('image') ||
-                        type.includes('video')
-                    )) {
-                        errors.push('type-not-allow')
-                        break
-                    }
-                    if (file.size > 104857600) {
-                        errors.push('max-size')
-                        break
-                    }
+                const arquivos = event.target.files || []
+                setShowModal(true)
+                for (const file of arquivos) {
+                    reader.addEventListener('progress', ({ loaded, total }) => {
+                        if (loaded && total) {
+                            const percent = (loaded / total) * 100
+                            setProgress(Math.round(percent))
+                        }
+                    })
                     reader.readAsDataURL(file)
                     reader.onload = e => {
-                        files.push(e.target.result)
+                        files.push({
+                            base64url: e.target.result,
+                            size: file.size,
+                            mimetype: file.type
+                        })
                     }
                 }
-                
+                await new Promise(resolve => setTimeout(() => resolve(), 2000))
+                setShowModal(false)
             })
         }
 
         const btnSend = document.getElementById('buttonSend')
-        if (btnSend) {
-            btnSend.addEventListener('click', () => {
-                const sendMessage = document.getElementById('inputSend')
-                const chat = document.getElementById('chat')
+        const sendMessage = document.getElementById('inputSend')
+        const chat = document.getElementById('chat')
+        if (btnSend && sendMessage && chat) {
+            const sendMsg = () => {
                 const message = sendMessage.value
-
-                if (files && files[0]) {
-                    socket.emit('message', { message, errors, files })
-                    errors.map(() => errors.pop())
-                } else {
-                    socket.emit('message', { message }) 
-                }
-                
                 sendMessage.value = ''
                 chat.scrollTop = chat.scrollHeight
+                socket.emit('message', { message, files })
+            }
+            btnSend.addEventListener('click', sendMsg)
+            sendMessage.addEventListener('keypress', event => {
+                const i = input[event.key]
+                if (i) {
+                    i({
+                        sendMsg
+                    })
+                }
             })
+        }
+        // fechar conexão
+        return () => {
+            socket.disconnect()
         }
     })
     const labelStyle = { margin: 0, padding: 0 }
     return (
         <Container fluid className="h-100">
+            <Row>
+                <Col>
+                    <Upload show={showModal} now={progress} label={`${progress}%`}/>
+                </Col>
+            </Row>
             <Row className="justify-content-center h-100">
                 <Col>
                     <Card>
@@ -112,8 +135,8 @@ export default function Home () {
                                 <InputGroup.Append>
                                     <Form.Label
                                         className="bg-primary"
-                                        style={labelStyle} 
-                                        htmlFor="mediaSend" 
+                                        style={labelStyle}
+                                        htmlFor="mediaSend"
                                     >
                                         <FontAwesomeIcon icon={faPaperclip} />
                                     </Form.Label>

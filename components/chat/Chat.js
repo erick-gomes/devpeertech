@@ -16,16 +16,16 @@ export default function Message ({ msg, status, files }) {
             return (
                 <>
                     {files.map(file => (
-                            <div key={++key} className="d-flex justify-content-center mb-2">
-                                <Image
-                                    width={300}
-                                    height={300}
-                                    alt="Ocorreu um erro ao carregar imagem."
-                                    src={file}
-                                />
-                            </div>
+                        <div key={++key} className="d-flex justify-content-center mb-2">
+                            <Image
+                                width={300}
+                                height={300}
+                                alt="Ocorreu um erro ao carregar imagem."
+                                src={file}
+                            />
+                        </div>
                     ))}
-                    <div className="d-flex justify-content-center mb-2">{msg}</div>
+                    {msg && <div className="d-flex justify-content-center mb-2">{msg}</div>}
                 </>
             )
         }
@@ -33,5 +33,4 @@ export default function Message ({ msg, status, files }) {
             <div className="d-flex justify-content-center mb-2">{msg}</div>
         )
     }
-    
 }

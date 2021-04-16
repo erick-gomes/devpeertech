@@ -3,6 +3,8 @@ import '../style/index.css'
 
 export default function MyApp ({ Component, pageProps }) {
     return (
-        <Component {...pageProps} />
+        <React.StrictMode>
+            <Component {...pageProps} />
+        </React.StrictMode>
     )
 }
