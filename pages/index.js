@@ -1,5 +1,4 @@
 import React from 'react'
-import { render } from 'react-dom'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faCommentDots, faPaperclip } from '@fortawesome/free-solid-svg-icons'
 import {
@@ -9,19 +8,25 @@ import {
 } from 'react-bootstrap'
 import io from 'socket.io-client'
 import socketVerify from '../utils/socket/socket.js'
-import Message from '../components/chat/Chat.js'
-import { input } from '../utils/inputs/input.js'
+import { Message } from '../components/chat/Chat.js'
+// import { input } from '../utils/inputs/input.js'
 import Upload from '../components/chat/Upload.js'
+import { toast, ToastContainer } from 'react-toastify'
+import $ from 'jquery'
+import ss from 'socket.io-stream'
+import 'react-toastify/dist/ReactToastify.css'
 
 export default function Home () {
     // states
+    const [rendered, setRendered] = React.useState([])
+    const [showUpload, setUpload] = React.useState(false)
     const [progress, setProgress] = React.useState(0)
-    const [showModal, setShowModal] = React.useState(false)
+    const [fileName, setFileName] = React.useState('mídia')
+    const [showRow, setRow] = React.useState(2)
+    // const toastId = React.useRef(null)
 
-    // DOM
+    // socket events
     React.useEffect(() => {
-        require('bootstrap')
-
         // socket instance
         const socket = io()
 
@@ -30,108 +35,146 @@ export default function Home () {
             console.table(ips)
         })
 
-        socket.once('connect', () => {
-            socket.emit('connect-server')
-        })
-
-        const rendered = []
         socket.on('con', ({ id, ip }) => {
-            const message = <Message key={rendered.length} msg={id} status="join"/>
-            rendered.push(message)
-            render(
-                <>{rendered}</>,
-                document.getElementById('chat')
-            )
+            const messages = rendered
+            messages.push(<Message key={rendered.length} msg={id} status="join"/>)
+            const messagesJSX = messages.map(m => m)
+            setRendered(messagesJSX)
         })
 
-        socket.on('msg', ({ msg, files }) => {
-            const key = rendered.length
-            const message = <Message key={key} id={key} msg={msg} files={files} status="message"/>
-            rendered.push(message)
-            render(
-                <>{rendered}</>,
-                document.getElementById('chat')
-            )
+        socket.on('err', err => toast(err))
+
+        socket.on('stream', (base64, type) => {
+            const file = {
+                url: `data:${type};base64,${base64}`,
+                type
+            }
+            const messages = rendered
+            messages.push(<Message file={file} key={rendered.length} status="message"/>)
+            const messagesJSX = messages.map(m => m)
+            setRendered(messagesJSX)
+        })
+
+        socket.on('msg', ({ msg }) => {
+            const messages = rendered
+            messages.push(<Message key={rendered.length} msg={msg} status="message"/>)
+            const messagesJSX = messages.map(m => m)
+            setRendered(messagesJSX)
         })
 
         socket.on('dc', dc => {
-            const message = <Message key={rendered.length} msg={dc} status="leave"/>
-            rendered.push(message)
-            render(
-                <>{rendered}</>,
-                document.getElementById('chat')
-            )
+            const messages = rendered
+            messages.push(<Message key={rendered.length} msg={dc} status="leave"/>)
+            const messagesJSX = messages.map(m => m)
+            setRendered(messagesJSX)
         })
 
         // event listeners
-        const mSend = document.getElementById('mediaSend')
-        const files = []
-        if (mSend) {
-            mSend.addEventListener('change', async event => {
-                const reader = new FileReader()
-                const arquivos = event.target.files || []
-                setShowModal(true)
-                for (const file of arquivos) {
-                    reader.addEventListener('progress', ({ loaded, total }) => {
-                        if (loaded && total) {
-                            const percent = (loaded / total) * 100
-                            setProgress(Math.round(percent))
-                        }
-                    })
-                    reader.readAsDataURL(file)
-                    reader.onload = e => {
-                        files.push({
-                            base64url: e.target.result,
-                            size: file.size,
-                            mimetype: file.type
-                        })
-                    }
-                }
-                await new Promise(resolve => setTimeout(() => resolve(), 2000))
-                setShowModal(false)
+        $('#mediaSend').on('change', async (event) => {
+            const arquivos = event.target.files
+            if (!arquivos && !arquivos[0]) return
+            const file = arquivos[0]
+            setFileName(file.name)
+
+            if (file.size > 104857600) {
+                toast('Upload cancelado, arquivo muito grande')
+                return
+            }
+            if (!(
+                file.type.includes('image') ||
+                file.type.includes('video') ||
+                file.type.includes('audio')
+            )) return toast('Arquivo não suportado')
+
+            setUpload(true)
+            const blobRead = ss.createBlobReadStream(file)
+
+            let size = 0
+
+            blobRead.on('data', (chunk) => {
+                size += chunk.length
+                const prog = Math.floor(size / file.size * 100)
+                socket.emit('bytes', chunk)
+                setProgress(prog)
             })
+
+            blobRead.on('end', () => {
+                socket.emit('bytes', false, file.type)
+                const timeSecond = 2
+                const afterTime = () => {
+                    setUpload(false)
+                }
+                setTimeout(afterTime, Math.round(timeSecond * 1000))
+            })
+        })
+
+        const sendMsg = () => {
+            const sendMessage = document.getElementById('inputSend')
+            const chat = document.getElementById('chat')
+            const message = sendMessage.value
+            if (message === '') return
+            sendMessage.value = ''
+            chat.scrollTop = chat.scrollHeight
+            socket.emit('message', { message })
         }
 
-        const btnSend = document.getElementById('buttonSend')
-        const sendMessage = document.getElementById('inputSend')
-        const chat = document.getElementById('chat')
-        if (btnSend && sendMessage && chat) {
-            const sendMsg = () => {
-                const message = sendMessage.value
-                sendMessage.value = ''
-                chat.scrollTop = chat.scrollHeight
-                socket.emit('message', { message, files })
+        $('#buttonSend').on('click', () => {
+            sendMsg()
+        })
+
+        $('#inputSend').on('focus', () => {
+            const timeout = 50
+            setRow(3)
+            setTimeout(() => {
+                setRow(4)
+                setTimeout(() => {
+                    setRow(5)
+                }, timeout)
+            }, timeout)
+        })
+
+        $('#inputSend').on('focusout', () => {
+            setRow(2)
+        })
+
+        /* $('#inputSend').on('keypress', (event) => {
+            const command = input[event.key]
+            if (command) {
+                command({ sendMsg })
             }
-            btnSend.addEventListener('click', sendMsg)
-            sendMessage.addEventListener('keypress', event => {
-                const i = input[event.key]
-                if (i) {
-                    i({
-                        sendMsg
-                    })
-                }
-            })
-        }
-        // fechar conexão
+        }) */
+
         return () => {
             socket.disconnect()
+            console.log('Fast refresh effect')
         }
-    })
+    }, [])
     const labelStyle = { margin: 0, padding: 0 }
     return (
         <Container fluid className="h-100">
+            <ToastContainer />
             <Row>
                 <Col>
-                    <Upload show={showModal} now={progress} label={`${progress}%`}/>
+                    <Upload
+                        fileName={fileName}
+                        show={showUpload}
+                        now={progress}
+                        label={`${progress}%`}
+                    />
                 </Col>
             </Row>
             <Row className="justify-content-center h-100">
                 <Col>
                     <Card>
-                        <Card.Body id="chat" className="scrollbar scrollbar-primary"/>
+                        <Card.Body id="chat" className="scrollbar scrollbar-primary">
+                            {rendered}
+                        </Card.Body>
                         <Card.Footer>
                             <InputGroup>
-                                <FormFile.Input id="mediaSend" accept="audio/*,video/*,image/*"/>
+                                <FormFile.Input
+                                    id="mediaSend"
+                                    accept="audio/*,video/*,image/*"
+                                />
                                 <InputGroup.Append>
                                     <Form.Label
                                         className="bg-primary"
@@ -146,7 +189,7 @@ export default function Home () {
                                     placeholder="Digite alguma mensagem..."
                                     aria-label="Digite alguma mensagem..."
                                     aria-describedby="basic-addon2"
-                                    as="textarea" rows={2}
+                                    as="textarea" rows={showRow}
                                 />
                                 <InputGroup.Append>
                                     <Button id="buttonSend">
@@ -163,7 +206,11 @@ export default function Home () {
 }
 
 export async function getServerSideProps ({ req, res }) {
-    socketVerify(req, res)
+    try {
+        await socketVerify(req, res)
+    } catch (error) {
+        console.error(error)
+    }
     return {
         props: {
 

@@ -1,22 +1,25 @@
 import React from 'react'
-import { ProgressBar, Modal } from 'react-bootstrap'
+import { Modal, ProgressBar } from 'react-bootstrap'
+import 'react-toastify/dist/ReactToastify.css'
 
-export default function Upload (props) {
+/**
+ *
+ * @param {{show:Boolean,now:Number,label:String,fileName:String}} param0 props
+ * @returns React Component
+ */
+export default function Upload ({ show, now, label, fileName }) {
     return (
         <Modal
-            size="lg"
-            aria-labelledby="contained-modal-title-vcenter"
-            centered
-            backdrop="static"
             animation={false}
+            centered={true}
+            show={show}
+            backdrop="static"
             keyboard={false}
-            show={props.show}>
-            <Modal.Header>
-                <Modal.Title>Carregando mídia...</Modal.Title>
+        >
+            <Modal.Header className={'text-center'}>
+                Carregando {fileName}
             </Modal.Header>
-            <Modal.Body>
-                <ProgressBar animated now={props.now} label={props.label} />
-            </Modal.Body>
+            <Modal.Body><ProgressBar animated now={now} label={label}/></Modal.Body>
         </Modal>
     )
 }
