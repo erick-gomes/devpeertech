@@ -3,6 +3,9 @@
   "version": "0.1.0",
   "author": "Erick Gomes",
   "private": true,
+  "engines": {
+    "node": "22.x"
+  },
   "scripts": {
     "dev": "npx tsx server.ts",
     "build": "next build",
