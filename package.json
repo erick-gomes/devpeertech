@@ -1,42 +1,42 @@
 {
-  "name": "with-react-bootstrap",
-  "version": "1.0.0",
+  "name": "devpeertech",
+  "version": "0.1.0",
   "author": "Erick Gomes",
-  "license": "MIT",
+  "private": true,
+  "engines": {
+    "node": "22.x"
+  },
   "scripts": {
-    "dev": "next dev",
+    "dev": "npx tsx server.ts",
     "build": "next build",
-    "start": "next start -p $PORT",
-    "export": "next export",
-    "deploy": "npm run build && npm run export"
+    "start": "NODE_ENV=production npx tsx server.ts",
+    "lint": "next lint"
   },
   "dependencies": {
-    "@fortawesome/fontawesome-svg-core": "latest",
-    "@fortawesome/free-solid-svg-icons": "latest",
-    "@fortawesome/react-fontawesome": "latest",
-    "bootstrap": "latest",
-    "jquery": "latest",
-    "next": "latest",
-    "popper.js": "latest",
-    "react": "latest",
-    "react-bootstrap": "latest",
-    "react-dom": "latest",
-    "react-toastify": "latest",
-    "request-ip": "latest",
-    "socket.io": "latest",
-    "socket.io-client": "latest",
-    "socket.io-stream": "latest"
+    "@fortawesome/fontawesome-svg-core": "^6.7.2",
+    "@fortawesome/free-solid-svg-icons": "^6.7.2",
+    "@fortawesome/react-fontawesome": "^0.2.2",
+    "bootstrap": "^5.3.3",
+    "jquery": "^3.7.1",
+    "next": "^15.1.7",
+    "popper.js": "^1.16.1",
+    "react": "^19.0.0",
+    "react-bootstrap": "^2.10.9",
+    "react-dom": "^19.0.0",
+    "react-toastify": "^11.0.5",
+    "request-ip": "^3.3.0",
+    "socket.io": "^4.8.1",
+    "socket.io-client": "^4.8.1"
   },
   "devDependencies": {
-    "eslint": "latest",
-    "eslint-config-prettier": "latest",
-    "eslint-config-standard": "latest",
-    "eslint-plugin-import": "latest",
-    "eslint-plugin-node": "latest",
-    "eslint-plugin-prettier": "latest",
-    "eslint-plugin-promise": "latest",
-    "eslint-plugin-react": "latest",
-    "prettier": "latest",
-    "prettier-config-standard": "latest"
+    "typescript": "^5",
+    "@types/node": "^20",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "@types/jquery": "^3.5.32",
+    "@types/request-ip": "^0.0.41",
+    "eslint": "^9",
+    "eslint-config-next": "15.1.7",
+    "@eslint/eslintrc": "^3"
   }
 }

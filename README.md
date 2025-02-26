@@ -1,21 +1,62 @@
-# Next.js with react-bootstrap example
+# DevPeerTech
 
-This example shows how to use Next.js along with [react-bootstrap](https://react-bootstrap.github.io/).
+## Descrição
 
-## Deploy your own
+DevPeerTech é um projeto de chat em tempo real desenvolvido com Next.js, React, Socket.IO e Bootstrap. Este projeto permite que os usuários se comuniquem em tempo real, enviando mensagens de texto e arquivos de mídia.
 
-Deploy the example using [Vercel](https://vercel.com?utm_source=github&utm_medium=readme&utm_campaign=next-example):
+## Funcionalidades
 
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/git/external?repository-url=https://github.com/vercel/next.js/tree/canary/examples/with-react-bootstrap&project-name=with-react-bootstrap&repository-name=with-react-bootstrap)
+- **Chat em tempo real**: Envie e receba mensagens instantaneamente.
+- **Upload de arquivos**: Suporte para envio de imagens, vídeos e áudios.
+- **Notificações**: Receba notificações de erros e eventos importantes através do React Toastify.
 
-## How to use
+## Estrutura do Projeto
 
-Execute [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app) with [npm](https://docs.npmjs.com/cli/init) or [Yarn](https://yarnpkg.com/lang/en/docs/cli/create/) to bootstrap the example:
+- **app/layout.tsx**: Layout principal da aplicação.
+- **app/page.tsx**: Página principal do chat.
+- **components/chat/Chat.tsx**: Componentes relacionados ao chat, incluindo mensagens e renderização de arquivos.
+- **components/chat/Upload.tsx**: Componente de upload de arquivos com barra de progresso.
+- **server.ts**: Servidor Node.js configurado com Socket.IO para comunicação em tempo real.
+- **style/index.css**: Estilos CSS personalizados para a aplicação.
+- **utils/inputs/input.ts**: Utilitário para mapeamento de entradas.
+- **utils/socket/message.ts**: Utilitário para manipulação de mensagens via Socket.IO.
 
-```bash
-npx create-next-app --example with-react-bootstrap with-react-bootstrap-app
-# or
-yarn create next-app --example with-react-bootstrap with-react-bootstrap-app
-```
+## Como Executar
 
-Deploy it to the cloud with [Vercel](https://vercel.com/new?utm_source=github&utm_medium=readme&utm_campaign=next-example) ([Documentation](https://nextjs.org/docs/deployment)).
+1. **Clone o repositório**:
+    ```sh
+    git clone https://github.com/erick-gomes/devpeertech.git
+    cd devpeertech
+    ```
+
+2. **Instale as dependências**:
+    ```sh
+    npm install
+    ```
+
+3. **Inicie o servidor de desenvolvimento**:
+    ```sh
+    npm run dev
+    ```
+
+4. **Acesse a aplicação**:
+    Abra o navegador e vá para `http://localhost:3000`.
+
+## Scripts Disponíveis
+
+- `dev`: Inicia o servidor de desenvolvimento.
+- `build`: Compila a aplicação para produção.
+- `start`: Inicia o servidor em modo de produção.
+- `lint`: Executa o linter para verificar problemas de código.
+
+## Dependências
+
+- **React**: Biblioteca JavaScript para construção de interfaces de usuário.
+- **Next.js**: Framework React para renderização do lado do servidor.
+- **Socket.IO**: Biblioteca para comunicação em tempo real.
+- **Bootstrap**: Framework CSS para design responsivo.
+- **React Toastify**: Biblioteca para notificações.
+
+## Autor
+
+- **Erick Gomes**
