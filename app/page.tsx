@@ -34,7 +34,7 @@ export default function Home() {
             console.table({ users, ips })
         })
 
-        socket.on('con', ({ id, ip }) => {
+        socket.on('con', ({ id }) => {
             const messages = rendered
             messages.push(<Message key={rendered.length} msg={id} status="join" />)
             const messagesJSX = messages.map(m => m)
@@ -72,7 +72,7 @@ export default function Home() {
             let offset = 0
             const CHUNK_SIZE = 64 * 1024
             return new ReadableStream<Uint8Array>({
-                start(controller) { },
+                start() { },
                 async pull(controller) {
                     if (offset >= file.size) {
                         controller.close()
