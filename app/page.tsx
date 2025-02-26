@@ -1,24 +1,24 @@
+"use client"
+
 import React from 'react'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faCommentDots, faPaperclip } from '@fortawesome/free-solid-svg-icons'
 import {
     Container, Button, InputGroup,
     FormControl, Card, Row,
-    Col, FormFile, Form
+    Col, Form
 } from 'react-bootstrap'
 import io from 'socket.io-client'
-import socketVerify from '../utils/socket/socket.js'
-import { Message } from '../components/chat/Chat.js'
+import { Message, MessageProps } from '@/components/chat/Chat'
 // import { input } from '../utils/inputs/input.js'
-import Upload from '../components/chat/Upload.js'
+import Upload from '@/components/chat/Upload'
 import { toast, ToastContainer } from 'react-toastify'
 import $ from 'jquery'
-import ss from 'socket.io-stream'
 import 'react-toastify/dist/ReactToastify.css'
 
-export default function Home () {
+export default function Home() {
     // states
-    const [rendered, setRendered] = React.useState([])
+    const [rendered, setRendered] = React.useState<React.ReactElement<MessageProps>[]>([])
     const [showUpload, setUpload] = React.useState(false)
     const [progress, setProgress] = React.useState(0)
     const [fileName, setFileName] = React.useState('mídia')
@@ -31,13 +31,12 @@ export default function Home () {
         const socket = io()
 
         socket.on('all-users', ({ users, ips }) => {
-            console.table(users)
-            console.table(ips)
+            console.table({ users, ips })
         })
 
         socket.on('con', ({ id, ip }) => {
             const messages = rendered
-            messages.push(<Message key={rendered.length} msg={id} status="join"/>)
+            messages.push(<Message key={rendered.length} msg={id} status="join" />)
             const messagesJSX = messages.map(m => m)
             setRendered(messagesJSX)
         })
@@ -50,29 +49,46 @@ export default function Home () {
                 type
             }
             const messages = rendered
-            messages.push(<Message file={file} key={rendered.length} status="message"/>)
+            messages.push(<Message file={file} key={rendered.length} status="message" />)
             const messagesJSX = messages.map(m => m)
             setRendered(messagesJSX)
         })
 
         socket.on('msg', ({ msg }) => {
             const messages = rendered
-            messages.push(<Message key={rendered.length} msg={msg} status="message"/>)
+            messages.push(<Message key={rendered.length} msg={msg} status="message" />)
             const messagesJSX = messages.map(m => m)
             setRendered(messagesJSX)
         })
 
         socket.on('dc', dc => {
             const messages = rendered
-            messages.push(<Message key={rendered.length} msg={dc} status="leave"/>)
+            messages.push(<Message key={rendered.length} msg={dc} status="leave" />)
             const messagesJSX = messages.map(m => m)
             setRendered(messagesJSX)
         })
 
+        const filesCustomStream = (file: File) => {
+            let offset = 0
+            const CHUNK_SIZE = 64 * 1024
+            return new ReadableStream<Uint8Array>({
+                start(controller) { },
+                async pull(controller) {
+                    if (offset >= file.size) {
+                        controller.close()
+                        return
+                    }
+                    const chunk = file.slice(offset, offset + CHUNK_SIZE)
+                    controller.enqueue(new Uint8Array(await chunk.arrayBuffer()))
+                    offset += CHUNK_SIZE
+                },
+                cancel() { }
+            })
+        }
         // event listeners
         $('#mediaSend').on('change', async (event) => {
-            const arquivos = event.target.files
-            if (!arquivos && !arquivos[0]) return
+            const arquivos = (event.target as HTMLInputElement).files
+            if (!arquivos || !arquivos[0]) return
             const file = arquivos[0]
             setFileName(file.name)
 
@@ -87,34 +103,37 @@ export default function Home () {
             )) return toast('Arquivo não suportado')
 
             setUpload(true)
-            const blobRead = ss.createBlobReadStream(file)
-
+            const stream = filesCustomStream(file)
+            const reader = stream.getReader()
             let size = 0
-
-            blobRead.on('data', (chunk) => {
-                size += chunk.length
-                const prog = Math.floor(size / file.size * 100)
-                socket.emit('bytes', chunk)
-                setProgress(prog)
-            })
-
-            blobRead.on('end', () => {
-                socket.emit('bytes', false, file.type)
-                const timeSecond = 2
-                const afterTime = () => {
-                    setUpload(false)
+            while (true) {
+                const { value, done } = await reader.read()
+                if (done) {
+                    socket.emit('bytes', false, file.type)
+                    const timeSecond = 2
+                    const afterTime = () => {
+                        setUpload(false)
+                    }
+                    setTimeout(afterTime, Math.round(timeSecond * 1000))
+                    return
                 }
-                setTimeout(afterTime, Math.round(timeSecond * 1000))
-            })
+                size += value.byteLength
+                const prog = Math.floor(size / file.size * 100)
+                setProgress(prog)
+                socket.emit('bytes', value)
+            }
         })
 
         const sendMsg = () => {
             const sendMessage = document.getElementById('inputSend')
             const chat = document.getElementById('chat')
-            const message = sendMessage.value
+            if (!sendMessage) return
+            const message = (sendMessage as HTMLInputElement).value
             if (message === '') return
-            sendMessage.value = ''
-            chat.scrollTop = chat.scrollHeight
+            (sendMessage as HTMLInputElement).value = ''
+            if (chat) {
+                chat.scrollTop = chat.scrollHeight
+            }
             socket.emit('message', { message })
         }
 
@@ -163,27 +182,28 @@ export default function Home () {
                     />
                 </Col>
             </Row>
-            <Row className="justify-content-center h-100">
+            <Row className="h-100">
                 <Col>
-                    <Card>
+                    <Card >
                         <Card.Body id="chat" className="scrollbar scrollbar-primary">
                             {rendered}
                         </Card.Body>
                         <Card.Footer>
                             <InputGroup>
-                                <FormFile.Input
+                                <Form.Control
+                                    type="file"
                                     id="mediaSend"
                                     accept="audio/*,video/*,image/*"
                                 />
-                                <InputGroup.Append>
-                                    <Form.Label
-                                        className="bg-primary"
-                                        style={labelStyle}
-                                        htmlFor="mediaSend"
-                                    >
-                                        <FontAwesomeIcon icon={faPaperclip} />
-                                    </Form.Label>
-                                </InputGroup.Append>
+
+                                <Form.Label
+                                    className="bg-primary"
+                                    style={labelStyle}
+                                    htmlFor="mediaSend"
+                                >
+                                    <FontAwesomeIcon icon={faPaperclip} />
+                                </Form.Label>
+
                                 <FormControl
                                     id="inputSend"
                                     placeholder="Digite alguma mensagem..."
@@ -191,11 +211,10 @@ export default function Home () {
                                     aria-describedby="basic-addon2"
                                     as="textarea" rows={showRow}
                                 />
-                                <InputGroup.Append>
-                                    <Button id="buttonSend">
-                                        <FontAwesomeIcon icon={faCommentDots} />
-                                    </Button>
-                                </InputGroup.Append>
+
+                                <Button id="buttonSend">
+                                    <FontAwesomeIcon icon={faCommentDots} />
+                                </Button>
                             </InputGroup>
                         </Card.Footer>
                     </Card>
@@ -203,17 +222,4 @@ export default function Home () {
             </Row>
         </Container>
     )
-}
-
-export async function getServerSideProps ({ req, res }) {
-    try {
-        await socketVerify(req, res)
-    } catch (error) {
-        console.error(error)
-    }
-    return {
-        props: {
-
-        }
-    }
 }

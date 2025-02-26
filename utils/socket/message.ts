@@ -1,22 +1,15 @@
-/**
- *
- * @param {String} message mensagem de texto
- * @param {{base64url:String,mimetype:String,size:Number}} file anexo da mensagem
- * @param {Server} io instância do servidor
- * @param {Socket} socket instância do cliente
- * @returns
- */
-export default function mensagemInput (message, file, io, socket) {
+import { Server, Socket } from "socket.io"
+
+export const mensagemInput = (message: string, file: { base64url: String, mimetype: String, size: Number }, io: Server, socket: Socket) => {
     return [
-        new Promise((resolve, reject) => {
+        new Promise<void>((resolve, reject) => {
             if (message) {
                 const msgSend = message.trim()
                 msgSend.length > 5000 && reject(new Error('maxlength'))
             }
             resolve()
         }),
-        new Promise((resolve, reject) => {
-            console.log('chegou aqui')
+        new Promise<void>((resolve, reject) => {
             if (file) {
                 io.emit('msg', {
                     file: {
