@@ -99,6 +99,9 @@ export default function Home() {
         }
         // event listeners
         const handleChange = async (event: Event) => {
+            if (event.target === null) {
+                return
+            }
             const arquivos = (event.target as HTMLInputElement).files
             if (!arquivos || !arquivos[0]) return
             const file = arquivos[0]
@@ -113,7 +116,7 @@ export default function Home() {
                 file.type.includes('video') ||
                 file.type.includes('audio')
             )) return toast('Arquivo não suportado')
-
+            setProgress(0)
             setUpload(true)
             const stream = filesCustomStream(file)
             const reader = stream.getReader()
@@ -126,7 +129,8 @@ export default function Home() {
                     const afterTime = () => {
                         setUpload(false)
                     }
-                    setTimeout(afterTime, Math.round(timeSecond * 1000))
+                    setTimeout(afterTime, Math.round(timeSecond * 1000));
+                    (event.target as HTMLInputElement).value = ''
                     return
                 }
                 size += value.byteLength
