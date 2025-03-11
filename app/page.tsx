@@ -3,17 +3,11 @@
 import React from 'react'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faCommentDots, faPaperclip } from '@fortawesome/free-solid-svg-icons'
-import {
-    Container, Button, InputGroup,
-    FormControl, Card, Row,
-    Col, Form
-} from 'react-bootstrap'
-import io from 'socket.io-client'
+import { Container, Button, InputGroup, Card, Row, Col, Form } from 'react-bootstrap'
+import io, { Socket } from 'socket.io-client'
 import { Message, MessageProps } from '@/components/chat/Chat'
-// import { input } from '../utils/inputs/input.js'
 import Upload from '@/components/chat/Upload'
 import { toast, ToastContainer } from 'react-toastify'
-import $ from 'jquery'
 import 'react-toastify/dist/ReactToastify.css'
 
 export default function Home() {
@@ -22,28 +16,46 @@ export default function Home() {
     const [showUpload, setUpload] = React.useState(false)
     const [progress, setProgress] = React.useState(0)
     const [fileName, setFileName] = React.useState('mídia')
-    const [showRow, setRow] = React.useState(2)
+    const [showRow, setRow] = React.useState(1)
     // const toastId = React.useRef(null)
-
+    const mediaSendRef = React.useRef<HTMLInputElement>(null)
+    const inputSendRef = React.useRef<HTMLTextAreaElement>(null)
+    const buttonSendRef = React.useRef<HTMLButtonElement>(null)
     // socket events
+    const socket = React.useRef<Socket>(null)
     React.useEffect(() => {
-        // socket instance
-        const socket = io()
+        console.log('Instância do socket criada')
+        socket.current = io()
+        return () => {
+            socket.current?.disconnect()
+            console.log('Fast refresh effect and User disconnected')
+        }
+    }, [])
+    React.useEffect(() => {
+        console.log('Eventos restartados')
+        if (!mediaSendRef.current ||
+            !inputSendRef.current ||
+            !buttonSendRef.current) {
+            return
+        }
+        const mediaSend = mediaSendRef.current
+        const inputSend = inputSendRef.current
+        const buttonSend = buttonSendRef.current
 
-        socket.on('all-users', ({ users, ips }) => {
+        socket.current?.on('all-users', ({ users, ips }) => {
             console.table({ users, ips })
         })
 
-        socket.on('con', ({ id }) => {
+        socket.current?.on('con', ({ id }) => {
             const messages = rendered
             messages.push(<Message key={rendered.length} msg={id} status="join" />)
             const messagesJSX = messages.map(m => m)
             setRendered(messagesJSX)
         })
 
-        socket.on('err', err => toast(err))
+        socket.current?.on('err', err => toast(err))
 
-        socket.on('stream', (base64, type) => {
+        socket.current?.on('stream', (base64, type) => {
             const file = {
                 url: `data:${type};base64,${base64}`,
                 type
@@ -54,14 +66,14 @@ export default function Home() {
             setRendered(messagesJSX)
         })
 
-        socket.on('msg', ({ msg }) => {
+        socket.current?.on('msg', ({ msg }) => {
             const messages = rendered
             messages.push(<Message key={rendered.length} msg={msg} status="message" />)
             const messagesJSX = messages.map(m => m)
             setRendered(messagesJSX)
         })
 
-        socket.on('dc', dc => {
+        socket.current?.on('dc', dc => {
             const messages = rendered
             messages.push(<Message key={rendered.length} msg={dc} status="leave" />)
             const messagesJSX = messages.map(m => m)
@@ -86,13 +98,13 @@ export default function Home() {
             })
         }
         // event listeners
-        $('#mediaSend').on('change', async (event) => {
+        const handleChange = async (event: Event) => {
             const arquivos = (event.target as HTMLInputElement).files
             if (!arquivos || !arquivos[0]) return
             const file = arquivos[0]
             setFileName(file.name)
-
-            if (file.size > 104857600) {
+            const MAX_FILE_SIZE = 1024 * 1024 * 100
+            if (file.size > MAX_FILE_SIZE) {
                 toast('Upload cancelado, arquivo muito grande')
                 return
             }
@@ -109,7 +121,7 @@ export default function Home() {
             while (true) {
                 const { value, done } = await reader.read()
                 if (done) {
-                    socket.emit('bytes', false, file.type)
+                    socket.current?.emit('bytes', false, file.type)
                     const timeSecond = 2
                     const afterTime = () => {
                         setUpload(false)
@@ -120,55 +132,48 @@ export default function Home() {
                 size += value.byteLength
                 const prog = Math.floor(size / file.size * 100)
                 setProgress(prog)
-                socket.emit('bytes', value)
+                socket.current?.emit('bytes', value)
             }
-        })
-
-        const sendMsg = () => {
-            const sendMessage = document.getElementById('inputSend')
+        }
+        const handleClick = () => {
             const chat = document.getElementById('chat')
-            if (!sendMessage) return
-            const message = (sendMessage as HTMLInputElement).value
-            if (message === '') return
-            (sendMessage as HTMLInputElement).value = ''
+            if (inputSend.value === '') {
+                return
+            }
             if (chat) {
                 chat.scrollTop = chat.scrollHeight
             }
-            socket.emit('message', { message })
+            const message = inputSend.value
+            socket.current?.emit('message', { message })
+            inputSend.value = ''
         }
-
-        $('#buttonSend').on('click', () => {
-            sendMsg()
-        })
-
-        $('#inputSend').on('focus', () => {
-            const timeout = 50
-            setRow(3)
-            setTimeout(() => {
-                setRow(4)
-                setTimeout(() => {
-                    setRow(5)
-                }, timeout)
-            }, timeout)
-        })
-
-        $('#inputSend').on('focusout', () => {
-            setRow(2)
-        })
-
-        /* $('#inputSend').on('keypress', (event) => {
-            const command = input[event.key]
-            if (command) {
-                command({ sendMsg })
+        const handleFocusOut = () => {
+            setRow(1)
+        }
+        const handleKeyDown = (event: KeyboardEvent) => {
+            const breakLines = inputSend.value.split('\n').length
+            if (event.key === 'Enter' && breakLines < 5) {
+                setRow(inputSend.rows + 1)
             }
-        }) */
-
-        return () => {
-            socket.disconnect()
-            console.log('Fast refresh effect')
+            if (event.key === 'Backspace' &&
+                breakLines <= 5 &&
+                inputSend.value.endsWith('\n')
+            ) {
+                setRow(Math.max(inputSend.rows - 1, 1))
+            }
         }
-    }, [])
-    const labelStyle = { margin: 0, padding: 0 }
+        mediaSend.addEventListener('change', handleChange)
+        inputSend.addEventListener('focusout', handleFocusOut)
+        buttonSend.addEventListener('click', handleClick)
+        inputSend.addEventListener('keydown', handleKeyDown)
+        return () => {
+            socket.current?.removeAllListeners()
+            mediaSend.removeEventListener('change', handleChange)
+            inputSend.removeEventListener('focusout', handleFocusOut)
+            buttonSend.removeEventListener('click', handleClick)
+            inputSend.removeEventListener('keydown', handleKeyDown)
+        }
+    })
     return (
         <Container fluid className="h-100">
             <ToastContainer />
@@ -184,35 +189,32 @@ export default function Home() {
             </Row>
             <Row className="h-100">
                 <Col>
-                    <Card >
+                    <Card>
                         <Card.Body id="chat" className="scrollbar scrollbar-primary">
                             {rendered}
                         </Card.Body>
                         <Card.Footer>
                             <InputGroup>
+                                <Form.Group controlId="mediaSend">
+                                    <Form.Label className="bg-primary">
+                                        <FontAwesomeIcon icon={faPaperclip} />
+                                    </Form.Label>
+                                    <Form.Control
+                                        type="file"
+                                        ref={mediaSendRef}
+                                        accept="audio/*,video/*,image/*"
+                                    />
+                                </Form.Group>
+
                                 <Form.Control
-                                    type="file"
-                                    id="mediaSend"
-                                    accept="audio/*,video/*,image/*"
-                                />
-
-                                <Form.Label
-                                    className="bg-primary"
-                                    style={labelStyle}
-                                    htmlFor="mediaSend"
-                                >
-                                    <FontAwesomeIcon icon={faPaperclip} />
-                                </Form.Label>
-
-                                <FormControl
-                                    id="inputSend"
+                                    ref={inputSendRef}
                                     placeholder="Digite alguma mensagem..."
                                     aria-label="Digite alguma mensagem..."
                                     aria-describedby="basic-addon2"
                                     as="textarea" rows={showRow}
                                 />
 
-                                <Button id="buttonSend">
+                                <Button ref={buttonSendRef}>
                                     <FontAwesomeIcon icon={faCommentDots} />
                                 </Button>
                             </InputGroup>
