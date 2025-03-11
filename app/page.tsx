@@ -173,7 +173,7 @@ export default function Home() {
             buttonSend.removeEventListener('click', handleClick)
             inputSend.removeEventListener('keydown', handleKeyDown)
         }
-    })
+    }, [rendered])
     return (
         <Container fluid className="h-100">
             <ToastContainer />
