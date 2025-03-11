@@ -17,7 +17,6 @@ export default function Home() {
     const [progress, setProgress] = React.useState(0)
     const [fileName, setFileName] = React.useState('mídia')
     const [showRow, setRow] = React.useState(1)
-    // const toastId = React.useRef(null)
     const mediaSendRef = React.useRef<HTMLInputElement>(null)
     const inputSendRef = React.useRef<HTMLTextAreaElement>(null)
     const buttonSendRef = React.useRef<HTMLButtonElement>(null)
@@ -217,7 +216,6 @@ export default function Home() {
                                     aria-describedby="basic-addon2"
                                     as="textarea" rows={showRow}
                                 />
-
                                 <Button ref={buttonSendRef}>
                                     <FontAwesomeIcon icon={faCommentDots} />
                                 </Button>
