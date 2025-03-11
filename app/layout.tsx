@@ -9,6 +9,7 @@ export default function RootLayout({
 }>) {
     return (
         <html lang="pt-br">
+            <title>Devpeertech Chat</title>
             <body>
                 <React.StrictMode>
                     {children}
